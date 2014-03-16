@@ -2,6 +2,10 @@
 from unittest import TestCase
 from pyramid import testing
 
+from datetime import (
+    datetime,
+    timedelta,
+)
 
 from bookie.models import DBSession
 from bookie.models.auth import Activation
@@ -106,6 +110,109 @@ class TestAuthUserDB(TestDBBase):
         activations = DBSession.query(Activation).all()
         self.assertEqual(
             0, len(activations), 'There should be no activations left')
+
+    def test_non_activated_account(self):
+        """Removing a non activated account"""
+        # When all the conditions are satisfied, the account should be deleted.
+        email = u'testingdelete@gmail.com'
+        UserMgr.signup_user(email, u'testcase')
+        activations = Activation.query.all()
+        users = User.query.all()
+        self.assertEqual(
+            1,
+            len(activations),
+            'We should have a total of 1 activation: ' + str(len(activations)))
+        self.assertEqual(
+            2,
+            len(users),
+            'We should have a total of 2 users: ' + str(len(users)))
+        activations[0].valid_until = datetime.utcnow() - timedelta(days=35)
+        UserMgr.delete_non_activated_account()
+        activations = Activation.query.all()
+        users = User.query.all()
+        self.assertEqual(
+            0,
+            len(activations),
+            'There should be no activations left')
+        self.assertEqual(
+            1,
+            len(users),
+            'We should have a total of 1 user still: ' + str(len(users)))
+        # When the account is activated, it should not be deleted.
+        email = u'testingactivated@gmail.com'
+        UserMgr.signup_user(email, u'testcase')
+        activations = Activation.query.all()
+        users = User.query.all()
+        self.assertEqual(
+            1,
+            len(activations),
+            'We should have a total of 1 activation: ' + str(len(activations)))
+        self.assertEqual(
+            2,
+            len(users),
+            'We should have a total of 2 users: ' + str(len(users)))
+        users[1].activated = True
+        UserMgr.delete_non_activated_account()
+        activations = Activation.query.all()
+        users = User.query.all()
+        self.assertEqual(
+            1,
+            len(activations),
+            'We should have a total of 1 activation still')
+        self.assertEqual(
+            2,
+            len(users),
+            'We should have a total of 2 users still: ' + str(len(users)))
+        # When the account last login is not None, it should not be deleted.
+        # This happens when a user forgets his/her password.
+        email = u'testinglastlogin@gmail.com'
+        UserMgr.signup_user(email, u'testcase')
+        activations = Activation.query.all()
+        users = User.query.all()
+        self.assertEqual(
+            2,
+            len(activations),
+            'We should have a total of 2 activations')
+        self.assertEqual(
+            3,
+            len(users),
+            'We should have a total of 3 users: ' + str(len(users)))
+        users[2].last_login = datetime.utcnow()
+        UserMgr.delete_non_activated_account()
+        activations = Activation.query.all()
+        users = User.query.all()
+        self.assertEqual(
+            2,
+            len(activations),
+            'We should have a total of 2 activations still')
+        self.assertEqual(
+            3,
+            len(users),
+            'We should have a total of 3 users still: ' + str(len(users)))
+        # The account should not be deleted before 30 days since signup.
+        email = u'testingdays@gmail.com'
+        UserMgr.signup_user(email, u'testcase')
+        activations = Activation.query.all()
+        users = User.query.all()
+        self.assertEqual(
+            3,
+            len(activations),
+            'We should have a total of 3 activations')
+        self.assertEqual(
+            4,
+            len(users),
+            'We should have a total of 4 users: ' + str(len(users)))
+        UserMgr.delete_non_activated_account()
+        activations = Activation.query.all()
+        users = User.query.all()
+        self.assertEqual(
+            3,
+            len(activations),
+            'We should have a total of 3 activations still')
+        self.assertEqual(
+            4,
+            len(users),
+            'We should have a total of 4 users still')
 
 
 class TestAuthMgr(TestCase):
