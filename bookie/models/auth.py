@@ -148,9 +148,8 @@ class UserMgr(object):
             filter(User.last_login == None).\
             filter(Activation.valid_until < test_date).all()
         for account in qry:
-            qry_users = User.query.filter(User.id == account.id).delete()
-            qry_activations = Activation.query.\
-                filter(Activation.id == account.id).delete()
+            User.query.filter(User.id == account.id).delete()
+            Activation.query.filter(Activation.id == account.id).delete()
 
     @staticmethod
     def get_list(active=None, order=None, limit=None):
