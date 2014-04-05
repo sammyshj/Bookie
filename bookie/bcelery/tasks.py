@@ -210,8 +210,8 @@ def email_signup_user(email, msg, settings, message_data):
     :param iid: import id we need to pull and work on
 
     """
-    from bookie.lib.message import InvitationMsg
-    msg = InvitationMsg(email, msg, settings)
+    from bookie.lib.message import ActivationMsg
+    msg = ActivationMsg(email, msg, settings)
     status = msg.send(message_data)
     if status == 4:
         from bookie.lib.applog import SignupLog
@@ -286,7 +286,7 @@ def fetch_unfetched_bmark_content(ignore_result=True):
 
     url_list = Bmark.query.outerjoin(
         Readable, Bmark.readable).\
-        filter(Readable.imported == None).all()
+        filter(Readable.imported.is_(None)).all()
 
     for bmark in url_list:
         fetch_bmark_content.delay(bmark.bid)
@@ -345,7 +345,7 @@ def fetch_bmark_content(bid):
     else:
         logger.error(
             'No readable record for bookmark: ',
-            str(bid, bmark.hashed.url))
+            str(bid), str(bmark.hashed.url))
 
         # There was a failure reading the thing.
         bmark.readable = Readable()

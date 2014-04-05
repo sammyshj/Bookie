@@ -13,7 +13,7 @@ from bookie.lib.access import api_auth
 from bookie.lib.applog import AuthLog
 from bookie.lib.applog import BmarkLog
 from bookie.lib.message import ReactivateMsg
-from bookie.lib.message import InvitationMsg
+from bookie.lib.message import ActivationMsg
 from bookie.lib.readable import ReadContent
 from bookie.lib.tagcommands import Commander
 
@@ -68,7 +68,6 @@ def ping(request):
     username = rdict.get('username', None)
     api_key = params.get('api_key', None)
     user = UserMgr.get(username=username)
-    
     # Check if user provided the correct api_key
     if api_key == user.api_key:
         return _api_response(request, {
@@ -79,7 +78,7 @@ def ping(request):
         return _api_response(request, {
             'success': False,
             'message': 'API key is invalid.'
-        })   
+        })
 
 
 @view_config(route_name="api_ping_missing_user", renderer="jsonp")
@@ -319,6 +318,13 @@ def bmark_recent(request, with_content=False):
     page = int(params.get('page', '0'))
     count = int(params.get('count', RESULTS_MAX))
 
+    # We need to check if we have an ordering crtieria specified.
+    order_by = params.get('sort', None)
+    if order_by == "popular":
+        order_by = Bmark.clicks.desc()
+    else:
+        order_by = Bmark.stored.desc()
+
     # we only want to do the username if the username is in the url
     username = rdict.get('username', None)
     if username:
@@ -347,7 +353,7 @@ def bmark_recent(request, with_content=False):
     # We don't allow with_content by default because of this bug.
     recent_list = BmarkMgr.find(
         limit=count,
-        order_by=Bmark.stored.desc(),
+        order_by=order_by,
         page=page,
         tags=tags,
         username=username,
@@ -403,75 +409,6 @@ def user_bmark_count(request):
         'count': result_set,
         'start_date': str(bmark_count_list[1]),
         'end_date': str(bmark_count_list[2])
-    })
-
-
-@view_config(route_name="api_bmarks_popular", renderer="jsonp")
-@view_config(route_name="api_bmarks_popular_user", renderer="jsonp")
-@api_auth('api_key', UserMgr.get, anon=True)
-def bmark_popular(request):
-    """Get a list of the most popular bmarks for the api call"""
-    rdict = request.matchdict
-    params = request.params
-
-    # check if we have a page count submitted
-    page = int(params.get('page', '0'))
-    count = int(params.get('count', RESULTS_MAX))
-    with_content = _check_with_content(params)
-
-    if request.user and request.user.username:
-        username = request.user.username
-    else:
-        username = None
-
-    # thou shalt not have more then the HARD MAX
-    # @todo move this to the .ini as a setting
-    if count > HARD_MAX:
-        count = HARD_MAX
-
-    # do we have any tags to filter upon
-    tags = rdict.get('tags', None)
-
-    if isinstance(tags, str):
-        tags = [tags]
-
-    # if we don't have tags, we might have them sent by a non-js browser as a
-    # string in a query string
-    if not tags and 'tag_filter' in params:
-        tags = params.get('tag_filter').split()
-
-    popular_list = BmarkMgr.find(
-        limit=count,
-        order_by=Bmark.clicks.desc(),
-        page=page,
-        tags=tags,
-        username=username,
-        with_content=with_content,
-        with_tags=True,
-    )
-
-    result_set = []
-
-    for res in popular_list:
-        return_obj = dict(res)
-        return_obj['tags'] = [dict(tag[1]) for tag in res.tags.items()]
-
-        # the hashed object is there as well, we need to pull the url and
-        # clicks from it as total_clicks
-        return_obj['url'] = res.hashed.url
-        return_obj['total_clicks'] = res.hashed.clicks
-
-        if with_content:
-            return_obj['readable'] = dict(res.hashed.readable)
-
-        result_set.append(return_obj)
-
-    return _api_response(request, {
-        'bmarks': result_set,
-        'max_count': RESULTS_MAX,
-        'count': len(popular_list),
-        'page': page,
-        'tag_filter': tags,
     })
 
 
@@ -675,11 +612,11 @@ def account_update(request):
 
     if 'email' in params and params['email'] is not None:
         email = params.get('email')
-        user_acct.email = email
+        user_acct.email = email.lower()
 
     if 'email' in json_body and json_body['email'] is not None:
         email = json_body.get('email')
-        user_acct.email = email
+        user_acct.email = email.lower()
 
     return _api_response(request, user_acct.safe_data())
 
@@ -848,7 +785,12 @@ def account_activate(request):
             'error': "Come on, pick a real password please",
         })
 
-    res = ActivationMgr.activate_user(username, activation, password)
+    username = username.lower()
+    new_username = new_username.lower() if new_username else None
+    res = ActivationMgr.activate_user(
+        username,
+        activation,
+        password)
 
     if res:
         # success so respond nicely
@@ -905,8 +847,9 @@ def invite_user(request):
             'error': "Please submit an email address"
         })
 
+    email = email.lower()
     # first see if the user is already in the system
-    exists = UserMgr.get(email=email)
+    exists = UserMgr.get(email=email.lower())
     if exists:
         request.response.status_int = 406
         return _api_response(request, {
@@ -914,7 +857,7 @@ def invite_user(request):
             'error': "This user is already a Bookie user!"
         })
 
-    new_user = user.invite(email)
+    new_user = user.invite(email.lower())
     if new_user:
         LOG.debug(new_user.username)
         # then this user is able to invite someone
@@ -924,7 +867,7 @@ def invite_user(request):
         # and then send an email notification
         # @todo the email side of things
         settings = request.registry.settings
-        msg = InvitationMsg(new_user.email,
+        msg = ActivationMsg(new_user.email,
                             "Enable your Bookie account",
                             settings)
 
@@ -952,7 +895,7 @@ def to_readable(request):
     url_list = Bmark.query.outerjoin(Readable, Readable.bid == Bmark.bid).\
         join(Bmark.hashed).\
         options(contains_eager(Bmark.hashed)).\
-        filter(Readable.imported == None).all()
+        filter(Readable.imported.is_(None)).all()
 
     def data(urls):
         """Yield out the results with the url in the data streamed."""
@@ -1096,7 +1039,7 @@ def new_user(request):
     u.username = unicode(rdict.get('username'))
     if u.username:
         u.username = u.username.lower()
-    u.email = unicode(rdict.get('email'))
+    u.email = unicode(rdict.get('email')).lower()
     passwd = get_random_word(8)
     u.password = passwd
     u.activated = True
