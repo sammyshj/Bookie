@@ -92,6 +92,9 @@ def build_routes(config):
     # NEW API
     #
 
+    # stats
+    config.add_route('api_stats', '/api/v1/stats')
+
     # ping checks
     config.add_route('api_ping',
                      '/api/v1/{username}/ping',
