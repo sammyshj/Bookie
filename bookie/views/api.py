@@ -139,7 +139,6 @@ def bmark_get(request):
     """
     rdict = request.matchdict
     params = request.params
-
     hash_id = rdict.get('hash_id', None)
     username = rdict.get('username', None)
     if username:
@@ -511,7 +510,7 @@ def search_results(request):
             username = request.user.username
 
     # with content is always in the get string
-    search_content = asbool(rdict.get('search_content', False))
+    search_content = asbool(rdict.get('with_content', False))
 
     conn_str = request.registry.settings.get('sqlalchemy.url', False)
     searcher = get_fulltext_handler(conn_str)
@@ -1193,3 +1192,30 @@ def admin_applog(request):
         'logs': [dict(l) for l in log_list],
     }
     return _api_response(request, ret)
+
+
+@view_config(route_name="api_admin_non_activated", renderer="jsonp")
+@api_auth('api_key', UserMgr.get, admin_only=True)
+def admin_non_activated(request):
+    """Return non activated account details"""
+    ret = []
+    res = UserMgr.non_activated_account()
+    if res:
+        ret = [u.username for u in res]
+
+    return _api_response(request, {
+        'count': len(ret),
+        'status': True,
+        'data': ret,
+    })
+
+
+@view_config(route_name="api_admin_delete_non_activated", renderer="jsonp")
+@api_auth('api_key', UserMgr.get, admin_only=True)
+def admin_delete_non_activated(request):
+    """Delete non activated accounts"""
+    UserMgr.non_activated_account(delete=True)
+    return _api_response(request, {
+        'status': True,
+        'message': 'Removed non activated accounts'
+    })

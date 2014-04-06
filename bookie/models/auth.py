@@ -137,19 +137,25 @@ class UserMgr(object):
         return User.query.count()
 
     @staticmethod
-    def delete_non_activated_account():
-        """Delete user accounts which are not verified since
+    def non_activated_account(delete=False):
+        """Get a list of  user accounts which are not verified since
         30 days of signup"""
         test_date = datetime.utcnow() - NON_ACTIVATION_AGE
-        qry = User.query.join(User.activation).\
-            options(contains_eager(User.activation)).\
-            filter(User.id == Activation.id).\
-            filter(User.activated == False).\
-            filter(User.last_login == None).\
-            filter(Activation.valid_until < test_date).all()
-        for account in qry:
-            User.query.filter(User.id == account.id).delete()
-            Activation.query.filter(Activation.id == account.id).delete()
+        query = DBSession.query(Activation.id).\
+            filter(Activation.valid_until < test_date).\
+            subquery(name="query")
+        qry = DBSession.query(User).\
+            filter(User.activated.is_(False)).\
+            filter(User.last_login.is_(None)).\
+            filter(User.id.in_(query))
+        # Delete the non activated accounts only if it is asked to.
+        if delete:
+            for user in qry.all():
+                DBSession.delete(user)
+        # If the non activated accounts are not asked to be deleted,
+        # return their details.
+        else:
+            return qry.all()
 
     @staticmethod
     def get_list(active=None, order=None, limit=None):

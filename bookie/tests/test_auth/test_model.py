@@ -127,7 +127,7 @@ class TestAuthUserDB(TestDBBase):
             len(users),
             'We should have a total of 2 users: ' + str(len(users)))
         activations[0].valid_until = datetime.utcnow() - timedelta(days=35)
-        UserMgr.delete_non_activated_account()
+        UserMgr.non_activated_account(delete=True)
         activations = Activation.query.all()
         users = User.query.all()
         self.assertEqual(
@@ -152,7 +152,7 @@ class TestAuthUserDB(TestDBBase):
             len(users),
             'We should have a total of 2 users: ' + str(len(users)))
         users[1].activated = True
-        UserMgr.delete_non_activated_account()
+        UserMgr.non_activated_account(delete=True)
         activations = Activation.query.all()
         users = User.query.all()
         self.assertEqual(
@@ -178,7 +178,7 @@ class TestAuthUserDB(TestDBBase):
             len(users),
             'We should have a total of 3 users: ' + str(len(users)))
         users[2].last_login = datetime.utcnow()
-        UserMgr.delete_non_activated_account()
+        UserMgr.non_activated_account(delete=True)
         activations = Activation.query.all()
         users = User.query.all()
         self.assertEqual(
@@ -202,7 +202,7 @@ class TestAuthUserDB(TestDBBase):
             4,
             len(users),
             'We should have a total of 4 users: ' + str(len(users)))
-        UserMgr.delete_non_activated_account()
+        UserMgr.non_activated_account(delete=True)
         activations = Activation.query.all()
         users = User.query.all()
         self.assertEqual(
@@ -213,6 +213,31 @@ class TestAuthUserDB(TestDBBase):
             4,
             len(users),
             'We should have a total of 4 users still')
+        # The account details should be shown if it is not asked to delete.
+        email = u'testingdetails@gmail.com'
+        UserMgr.signup_user(email, u'testcase')
+        activations = Activation.query.all()
+        users = User.query.all()
+        self.assertEqual(
+            4,
+            len(activations),
+            'We should have a total of 4 activations')
+        self.assertEqual(
+            5,
+            len(users),
+            'We should have a total of 5 users: ' + str(len(users)))
+        account_signup = datetime.utcnow() - timedelta(days=35)
+        activations[3].valid_until = account_signup
+        account_details = UserMgr.non_activated_account(delete=False)
+        self.assertEqual(
+            email,
+            account_details[0].email)
+        self.assertEqual(
+            False,
+            account_details[0].activated)
+        self.assertEqual(
+            u'testcase',
+            account_details[0].invited_by)
 
 
 class TestAuthMgr(TestCase):
