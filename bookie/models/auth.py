@@ -23,7 +23,6 @@ from sqlalchemy import Integer
 from sqlalchemy import Unicode
 from sqlalchemy import Boolean
 
-from sqlalchemy.orm import contains_eager
 from sqlalchemy.orm import relation
 from sqlalchemy.orm import synonym
 
