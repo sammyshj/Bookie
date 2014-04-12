@@ -755,14 +755,29 @@ class BookieAPITest(unittest.TestCase):
         self.assertEqual(ping['message'], "The API url should be /api/v1")
         self._check_cors_headers(res)
 
-    def test_stats(self):
-        """Test getting the public stats"""
-        res = self.testapp.get(u'/api/v1/stats',
+    def test_bookmarks_stats(self):
+        """Test the bookmark stats"""
+        res = self.testapp.get(u'/api/v1/bookmarkstats',
                                status=200)
         data = json.loads(res.body)
         self.assertTrue(
-            'bookmark_data' in data,
-            "Should have bookmark data: " + str(data))
+            'count' in data,
+            "Should have bookmark count: " + str(data))
         self.assertTrue(
-            'user_data' in data,
-            "Should have user data: " + str(data))
+            'unique_count' in data,
+            "Should have unique bookmark count: " + str(data))
+
+    def test_user_stats(self):
+        """Test the user stats"""
+        res = self.testapp.get(u'/api/v1/userstats',
+                               status=200)
+        data = json.loads(res.body)
+        self.assertTrue(
+            'count' in data,
+            "Should have user count: " + str(data))
+        self.assertTrue(
+            'activations' in data,
+            "Should have pending user activations: " + str(data))
+        self.assertTrue(
+            'with_bookmarks' in data,
+            "Should have count of users with bookmarks: " + str(data))
