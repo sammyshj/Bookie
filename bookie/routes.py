@@ -93,8 +93,12 @@ def build_routes(config):
     #
 
     # stats
-    config.add_route('api_bookmark_stats', '/api/v1/bookmarkstats')
-    config.add_route('api_user_stats', '/api/v1/userstats')
+    config.add_route('api_bookmark_stats',
+                     '/api/v1/bookmarkstats',
+                     request_method='GET')
+    config.add_route('api_user_stats',
+                     '/api/v1/userstats',
+                     request_method='GET')
 
     # ping checks
     config.add_route('api_ping',

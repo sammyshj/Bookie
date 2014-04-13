@@ -694,6 +694,53 @@ YUI.add('bookie-api', function (Y) {
         }
     );
 
+
+    /**
+     * Fetch the user stats
+     *
+     * @class Api.route.UserStats
+     * @extends Api.route
+     *
+     */
+    Y.bookie.Api.route.UserStats = Y.Base.create(
+        'bookie-api-route-user-stats',
+        Y.bookie.Api.route,
+        [], {
+            initializer: function(cfg) {
+            }
+        }, {
+            ATTRS: {
+                url_element: {
+                    value: '/api/v1/userstats'
+                }
+            }
+        }
+    );
+
+
+    /**
+     * Fetch the bookmark stats
+     *
+     * @class Api.route.BookmarkStats
+     * @extends Api.route
+     *
+     */
+    Y.bookie.Api.route.BookmarkStats = Y.Base.create(
+        'bookie-api-route-bookmark-stats',
+        Y.bookie.Api.route,
+        [], {
+            initializer: function(cfg) {
+            }
+        }, {
+            ATTRS: {
+                url_element: {
+                    value: '/api/v1/bookmarkstats'
+                }
+            }
+        }
+    );
+
+
     /**
      * Fetch user bookmark count over a period of time
      *

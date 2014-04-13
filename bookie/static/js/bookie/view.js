@@ -962,6 +962,73 @@ YUI.add('bookie-view', function (Y) {
 
     });
 
+
+    /**
+     * Generate the view for user stats
+     * @class UserStatsView
+     * @extends Y.View
+     *
+     */
+    ns.UserStatsView = Y.Base.create('user-stats-view', Y.View, [], {
+        /**
+         * General initializer
+         *
+         * @method initializer
+         * @param none
+         *
+         */
+        initializer: function () {
+            this.api = new Y.bookie.Api.route.UserStats();
+            this.api.call({
+                success: function(data, request) {
+                    var count = Y.one('#user_stats_count'),
+                    activations = Y.one('#user_stats_activations'),
+                    with_bookmarks = Y.one('#user_stats_with_bookmarks');
+                    count.setContent(data.count);
+                    activations.setContent(data.activations);
+                    with_bookmarks.setContent(data.with_bookmarks);
+		},
+                error: function (data, status_str, response, args) {
+                    var user_stats_error = Y.one('#user_stats_msg');
+                    user_stats_error.setContent('Error fetching stats');
+                }
+            });
+        }
+    });
+
+
+    /**Generate the view for bookmark stats
+     * @class BookmarkStatsView
+     * extends Y.View
+     *
+     */
+    ns.BookmarkStatsView = Y.Base.create('bookmark-stats-view', Y.View, [], {
+        /**
+         *
+         * General initializer
+         *
+         * @method initializer
+         * @param none
+         *
+         */
+        initializer: function() {
+            this.api = new Y.bookie.Api.route.BookmarkStats();
+            this.api.call({
+                success: function(data, request) {
+                    var count = Y.one('#bookmark_stats_count'),
+                    unique_count = Y.one('#bookmark_stats_unique_count');
+                    count.setContent(data.count);
+                    unique_count.setContent(data.unique_count);
+                },
+                error: function (data, status_str, response, args) {
+                    var bookmark_stats_error = Y.one('#bookmark_stats_msg');
+                    bookmark_stats_error.setContent('Error fetching stats');
+                }
+            });
+	}
+    });
+
+
     /**
      * Generate the graph for user bookmark count
      *
