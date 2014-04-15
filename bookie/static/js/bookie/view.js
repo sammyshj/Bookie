@@ -982,7 +982,8 @@ YUI.add('bookie-view', function (Y) {
             this.activations = Y.one('#user_stats_activations');
             this.with_bookmarks = Y.one('#user_stats_with_bookmarks');
             this.user_stats_error = Y.one('#user_stats_msg');
-            this.api = new Y.bookie.Api.route.UserStats();
+            this.api_cfg = this.get('api_cfg');
+            this.api = new Y.bookie.Api.route.UserStats(this.api_cfg);
         },
         render: function () {
             that = this;
@@ -991,6 +992,7 @@ YUI.add('bookie-view', function (Y) {
                     that.count.setContent(data.count);
                     that.activations.setContent(data.activations);
                     that.with_bookmarks.setContent(data.with_bookmarks);
+                    that.user_stats_error.setContent('');
 		},
                 error: function (data, status_str, response, args) {
                     that.user_stats_error.setContent('Error fetching stats');
@@ -1018,7 +1020,8 @@ YUI.add('bookie-view', function (Y) {
             this.count = Y.one('#bookmark_stats_count');
             this.unique_count = Y.one('#bookmark_stats_unique_count');
             this.bookmark_stats_error = Y.one('#bookmark_stats_msg');
-            this.api = new Y.bookie.Api.route.BookmarkStats();
+            this.api_cfg = this.get('api_cfg');
+            this.api = new Y.bookie.Api.route.BookmarkStats(this.api_cfg);
         },
         render: function () {
             that = this;
@@ -1026,6 +1029,7 @@ YUI.add('bookie-view', function (Y) {
                 success: function(data, request) {
                     that.count.setContent(data.count);
                     that.unique_count.setContent(data.unique_count);
+                    that.bookmark_stats_error.setContent('');
                 },
                 error: function (data, status_str, response, args) {
                     that.bookmark_stats_error.setContent('Error fetching stats');

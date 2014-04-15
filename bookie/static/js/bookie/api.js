@@ -706,12 +706,12 @@ YUI.add('bookie-api', function (Y) {
         'bookie-api-route-user-stats',
         Y.bookie.Api.route,
         [], {
-            initializer: function(cfg) {
+            initializer: function (cfg) {
             }
         }, {
             ATTRS: {
                 url_element: {
-                    value: '/api/v1/stats/users'
+                    value: '/stats/users'
                 }
             }
         }
@@ -729,12 +729,12 @@ YUI.add('bookie-api', function (Y) {
         'bookie-api-route-bookmark-stats',
         Y.bookie.Api.route,
         [], {
-            initializer: function(cfg) {
+            initializer: function (cfg) {
             }
         }, {
             ATTRS: {
                 url_element: {
-                    value: '/api/v1/stats/bookmarks'
+                    value: '/stats/bookmarks'
                 }
             }
         }

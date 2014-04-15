@@ -1,6 +1,6 @@
 <%inherit file="/main_wrap.mako" />
 <%def name="title()">Bookie Dashboard</%def>
-<div class="form">
+<div class="form" id="user_stats">
 <h2>User Data</h2>
 
 <div id="user_stats_msg" class="error"></div>
@@ -12,7 +12,7 @@
 </div>
 
 
-<div class="form">
+<div class="form" id="bookmark_stats">
 <h2>Bookmark Data</h2>
 
 <div id="bookmark_stats_msg" class="error"></div>
@@ -32,11 +32,16 @@
         // Create a new YUI instance and populate it with the required modules.
         YUI().use('bookie-view', function (Y) {
             Y.on('domready', function() {
-                var user_stats = new Y.bookie.UserStatsView({
-                    container: Y.one('body')
-                });
-                var bookmark_stats = new Y.bookie.BookmarkStatsView({
-                    container: Y.one('body')
+                var api_cfg = {
+                    url: APP_URL + '/api/v1',
+                },
+                user_stats = new Y.bookie.UserStatsView({
+                    api_cfg: api_cfg,
+                    container: Y.one('#user_stats')
+                }),
+                bookmark_stats = new Y.bookie.BookmarkStatsView({
+                    api_cfg: api_cfg,
+                    container: Y.one('#bookmark_stats')
                 });
                 user_stats.render();
                 bookmark_stats.render();

@@ -757,7 +757,7 @@ class BookieAPITest(unittest.TestCase):
 
     def test_bookmarks_stats(self):
         """Test the bookmark stats"""
-        res = self.testapp.get(u'/api/v1/bookmarkstats',
+        res = self.testapp.get(u'/api/v1/stats/bookmarks',
                                status=200)
         data = json.loads(res.body)
         self.assertTrue(
@@ -769,7 +769,7 @@ class BookieAPITest(unittest.TestCase):
 
     def test_user_stats(self):
         """Test the user stats"""
-        res = self.testapp.get(u'/api/v1/userstats',
+        res = self.testapp.get(u'/api/v1/stats/users',
                                status=200)
         data = json.loads(res.body)
         self.assertTrue(
