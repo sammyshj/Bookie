@@ -38,6 +38,8 @@
                 var bookmark_stats = new Y.bookie.BookmarkStatsView({
                     container: Y.one('body')
                 });
+                user_stats.render();
+                bookmark_stats.render();
             });
         });
     </script>

@@ -696,7 +696,7 @@ YUI.add('bookie-api', function (Y) {
 
 
     /**
-     * Fetch the user stats
+     * Fetch stats about the number of users on the site.
      *
      * @class Api.route.UserStats
      * @extends Api.route
@@ -711,7 +711,7 @@ YUI.add('bookie-api', function (Y) {
         }, {
             ATTRS: {
                 url_element: {
-                    value: '/api/v1/userstats'
+                    value: '/api/v1/stats/users'
                 }
             }
         }
@@ -719,7 +719,7 @@ YUI.add('bookie-api', function (Y) {
 
 
     /**
-     * Fetch the bookmark stats
+     * Fetch stats about the number of bookmarks on the site.
      *
      * @class Api.route.BookmarkStats
      * @extends Api.route
@@ -734,7 +734,7 @@ YUI.add('bookie-api', function (Y) {
         }, {
             ATTRS: {
                 url_element: {
-                    value: '/api/v1/bookmarkstats'
+                    value: '/api/v1/stats/bookmarks'
                 }
             }
         }
