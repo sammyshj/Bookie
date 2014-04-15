@@ -117,7 +117,7 @@ YUI.add('bookie-test-stats', function (Y) {
                 Y.Assert.areEqual('', success_msg.getContent());
                 Y.Assert.areEqual(count, stats_count.getContent());
                 Y.Assert.areEqual(unique_count, stats_unique_count.getContent());
-                Y.bookie.Api.route.UserStats = old_method;
+                Y.bookie.Api.route.BookmarkStats = old_method;
             }, 500);
         }
     }));
