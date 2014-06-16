@@ -185,7 +185,7 @@ class TagMgr(object):
             qry = Tag.query.filter(Tag.name.startswith(prefix))
 
             # if we have a username limit to only bookmarks of that user
-            if username is not None:
+            if username:
                 qry = qry.filter(Tag.bmark.any(username=username))
 
             qry = qry.order_by(Tag.name).limit(limit)
