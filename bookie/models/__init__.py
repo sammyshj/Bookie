@@ -168,7 +168,8 @@ class TagMgr(object):
         return qry.all()
 
     @staticmethod
-    def complete(prefix, current=None, limit=5, username=None):
+    def complete(prefix, current=None, limit=5, username=None,
+                 requested_by=None):
         """Find all of the tags that begin with prefix
 
         :param current: a list of current tags to compare with
@@ -209,8 +210,14 @@ class TagMgr(object):
 
             good_bmarks = DBSession.query(Bmark.bid)
 
-            if username is not None:
+            if username:
                 good_bmarks = good_bmarks.filter(Bmark.username == username)
+                if username != requested_by:
+                    good_bmarks = good_bmarks.\
+                        filter(Bmark.is_private == False)   # noqa
+            else:
+                good_bmarks = good_bmarks.\
+                    filter(Bmark.is_private == False)   # noqa
 
             good_bmarks = good_bmarks.\
                 filter(Bmark.tags.any(Tag.tid.in_(current_tags))).\
