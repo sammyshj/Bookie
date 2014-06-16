@@ -101,7 +101,7 @@ class TestTagMgrStats(TestDBBase):
         user.username = gen_random_word(10)
         DBSession.add(user)
 
-         # Generate demo tag into the system
+        # Generate demo tag into the system
         tags = [make_tag() for i in range(5)]
         [DBSession.add(t) for t in tags]
 
@@ -136,7 +136,7 @@ class TestTagMgrStats(TestDBBase):
         user.username = gen_random_word(10)
         DBSession.add(user)
 
-         # Generate demo tag into the system
+        # Generate demo tag into the system
         tags = [make_tag() for i in range(5)]
         [DBSession.add(t) for t in tags]
 
