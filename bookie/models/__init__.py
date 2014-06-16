@@ -187,6 +187,14 @@ class TagMgr(object):
             # if we have a username limit to only bookmarks of that user
             if username:
                 qry = qry.filter(Tag.bmark.any(username=username))
+                if username != requested_by:
+                    bmark = aliased(Bmark)
+                    qry = qry.join((bmark, Tag.bmark)).\
+                        filter(bmark.is_private == False)   # noqa
+            else:
+                bmark = aliased(Bmark)
+                qry = qry.join((bmark, Tag.bmark)).\
+                    filter(bmark.is_private == False)   # noqa
 
             qry = qry.order_by(Tag.name).limit(limit)
             return qry.all()
