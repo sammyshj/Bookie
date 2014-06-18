@@ -779,7 +779,7 @@ class BookieAPITest(unittest.TestCase):
     def test_bookmark_tag_complete_unauthorized_access(self):
         self._get_good_request()
 
-        res = self.testapp.get(
+        self.testapp.get(
             '/api/v1/admin/tags/complete',
             params={
                 'tag': 'py'

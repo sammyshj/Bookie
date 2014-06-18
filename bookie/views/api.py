@@ -610,7 +610,6 @@ def tag_complete(request):
         request.response.status_int = 403
         return _api_response(request, {})
 
-
     if 'current' in params and params['current'] != "":
         current_tags = params['current'].split()
     else:
