@@ -3,7 +3,6 @@
 from bookie.models import (
     BmarkMgr,
     DBSession,
-    Readable,
     Tag,
     TagMgr,
 )
