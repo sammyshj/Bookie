@@ -130,6 +130,12 @@ class TestTagMgrStats(TestDBBase):
             tags[0] in suggestions,
             "The sample tag was found in the completion set")
 
+        # Also check when username is None.
+        suggestions = TagMgr.complete(test_str, username=None)
+        self.assertTrue(
+            tags[0] in suggestions,
+            "The sample tag was found in the completion set")
+
     def test_basic_complete_diff_user_accounts_for_privacy(self):
         """Tags should not provide completion options."""
         user = User()
@@ -162,7 +168,13 @@ class TestTagMgrStats(TestDBBase):
                                       requested_by=gen_random_word(10))
         self.assertTrue(
             tags[0] not in suggestions,
-            "The sample tag was found in the completion set")
+            "The sample tag was not found in the completion set")
+
+        # Also check when username is None.
+        suggestions = TagMgr.complete(test_str, username=None)
+        self.assertTrue(
+            tags[0] not in suggestions,
+            "The sample tag was not found in the completion set")
 
     def test_case_insensitive(self):
         """Suggestion does not care about case of the prefix."""
