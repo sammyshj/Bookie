@@ -735,6 +735,8 @@ class BookieAPITest(unittest.TestCase):
         self._check_cors_headers(res)
 
     def test_bookmark_tag_complete_same_user_accounts_for_privacy(self):
+        """Test that same user gets back tag completion from their
+        private bookmarks"""
         self._get_good_request(is_private=True)
 
         res = self.testapp.get(
@@ -747,8 +749,11 @@ class BookieAPITest(unittest.TestCase):
         self.assertTrue(
             'python' in res.body,
             "Should have python as a tag completion: " + res.body)
+        self._check_cors_headers(res)
 
     def test_bookmark_tag_complete_anon_user(self):
+        """Test that anon user gets back tag completion from others
+        public bookmarks"""
         self._get_good_request()
 
         res = self.testapp.get(
@@ -761,8 +766,11 @@ class BookieAPITest(unittest.TestCase):
         self.assertTrue(
             'python' in res.body,
             "Should have python as a tag completion: " + res.body)
+        self._check_cors_headers(res)
 
     def test_bookmark_tag_complete_anon_user_accounts_for_privacy(self):
+        """Test that anon user does not get back tag completion from others
+        private bookmarks"""
         self._get_good_request(is_private=True)
 
         res = self.testapp.get(
@@ -775,6 +783,7 @@ class BookieAPITest(unittest.TestCase):
         self.assertTrue(
             'python' not in res.body,
             "Should not have python as a tag completion: " + res.body)
+        self._check_cors_headers(res)
 
     def test_bookmark_tag_complete_unauthorized_access(self):
         self._get_good_request()
