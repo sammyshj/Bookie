@@ -187,6 +187,10 @@ class TagMgr(object):
             # if we have a username limit to only bookmarks of that user
             if username:
                 qry = qry.filter(Tag.bmark.any(username=username))
+                # If username == requested_by, we want all the bookmarks so,
+                # no need to filter on is_private.
+                # If username != requested_by, we want to limit to only
+                # public bookmarks.
                 if username != requested_by:
                     bmark = aliased(Bmark)
                     qry = qry.join((bmark, Tag.bmark)).\
