@@ -1,7 +1,6 @@
 """Test the basics including the bmark and tags"""
 
 from bookie.models import (
-    BmarkMgr,
     DBSession,
     Tag,
     TagMgr,
@@ -10,7 +9,10 @@ from bookie.models.auth import User
 
 from bookie.tests import gen_random_word
 from bookie.tests import TestDBBase
-from bookie.tests.factory import make_tag
+from bookie.tests.factory import (
+    make_tag,
+    make_bookmark,
+)
 
 
 class TestTagMgrStats(TestDBBase):
@@ -45,14 +47,14 @@ class TestTagMgrStats(TestDBBase):
         bmark_ext = u'Some extended notes'
 
         # Store the bookmark.
-        BmarkMgr.store(
-            url=bmark_url,
-            username=user.username,
-            desc=bmark_desc,
-            ext=bmark_ext,
-            tags=bmark_tags,
-            is_private=False,
-        )
+        bmark = make_bookmark()
+        bmark.url = bmark_url
+        bmark.username = user.username
+        bmark.description = bmark_desc
+        bmark.extended = bmark_ext
+        bmark.tags = TagMgr.from_string(bmark_tags)
+        bmark.is_private = False
+        DBSession.add(bmark)
 
         test_str = tags[0].name[0:2]
         suggestions = TagMgr.complete(test_str, username=user.username,
@@ -80,13 +82,13 @@ class TestTagMgrStats(TestDBBase):
         bmark_ext = u'Some extended notes'
 
         # Store the bookmark.
-        BmarkMgr.store(
-            url=bmark_url,
-            username=user.username,
-            desc=bmark_desc,
-            ext=bmark_ext,
-            tags=bmark_tags,
-        )
+        bmark = make_bookmark()
+        bmark.url = bmark_url
+        bmark.username = user.username
+        bmark.description = bmark_desc
+        bmark.extended = bmark_ext
+        bmark.tags = TagMgr.from_string(bmark_tags)
+        DBSession.add(bmark)
 
         test_str = tags[0].name[0:2]
         suggestions = TagMgr.complete(test_str, username=user.username,
@@ -114,14 +116,14 @@ class TestTagMgrStats(TestDBBase):
         bmark_ext = u'Some extended notes'
 
         # Store the bookmark.
-        BmarkMgr.store(
-            url=bmark_url,
-            username=user.username,
-            desc=bmark_desc,
-            ext=bmark_ext,
-            tags=bmark_tags,
-            is_private=False,
-        )
+        bmark = make_bookmark()
+        bmark.url = bmark_url
+        bmark.username = user.username
+        bmark.description = bmark_desc
+        bmark.extended = bmark_ext
+        bmark.tags = TagMgr.from_string(bmark_tags)
+        bmark.is_private = False
+        DBSession.add(bmark)
 
         test_str = tags[0].name[0:2]
         suggestions = TagMgr.complete(test_str, username=user.username,
@@ -155,13 +157,13 @@ class TestTagMgrStats(TestDBBase):
         bmark_ext = u'Some extended notes'
 
         # Store the bookmark.
-        BmarkMgr.store(
-            url=bmark_url,
-            username=user.username,
-            desc=bmark_desc,
-            ext=bmark_ext,
-            tags=bmark_tags,
-        )
+        bmark = make_bookmark()
+        bmark.url = bmark_url
+        bmark.username = user.username
+        bmark.description = bmark_desc
+        bmark.extended = bmark_ext
+        bmark.tags = TagMgr.from_string(bmark_tags)
+        DBSession.add(bmark)
 
         test_str = tags[0].name[0:2]
         suggestions = TagMgr.complete(test_str, username=user.username,
@@ -195,13 +197,13 @@ class TestTagMgrStats(TestDBBase):
         bmark_ext = u'Some extended notes'
 
         # Store the bookmark.
-        BmarkMgr.store(
-            url=bmark_url,
-            username=user.username,
-            desc=bmark_desc,
-            ext=bmark_ext,
-            tags=bmark_tags,
-        )
+        bmark = make_bookmark()
+        bmark.url = bmark_url
+        bmark.username = user.username
+        bmark.description = bmark_desc
+        bmark.extended = bmark_ext
+        bmark.tags = TagMgr.from_string(bmark_tags)
+        DBSession.add(bmark)
 
         test_str = tags[0].name[0:4].upper()
         suggestions = TagMgr.complete(test_str, username=user.username,
